@@ -12,6 +12,11 @@ import org.springframework.cloud.sleuth.sampler.AlwaysSampler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
+import org.springframework.web.context.request.RequestContextListener;
+
+import com.netflix.hystrix.strategy.concurrency.HystrixContextCallable;
+
+import io.jmnarloch.spring.boot.hystrix.context.HystrixCallableWrapper;
 
 @EnableDiscoveryClient
 @EnableFeignClients
@@ -26,6 +31,11 @@ public class FeignSampleServiceApplication {
 	@Bean
 	public Sampler alwaysSample() {
 		return new AlwaysSampler();
+	}
+	
+	@Bean
+	public RequestContextListener requestContextListener() {
+	    return new RequestContextListener();
 	}
 	
 	@Autowired
