@@ -2,3 +2,5 @@
 .recommenders
 RemoteSystemsTempFiles
 Servers
+*/node_modules
+*/npm-debug.log

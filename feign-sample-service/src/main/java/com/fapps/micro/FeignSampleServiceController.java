@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fapps.micro.feign.NodeSimpleServiceProxy;
 import com.fapps.micro.feign.SubstracterServiceProxy;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
@@ -18,6 +19,9 @@ public class FeignSampleServiceController {
 	@Autowired
 	private SubstracterServiceProxy proxy;
 	
+	@Autowired
+	private NodeSimpleServiceProxy nodeProxy;
+	
 	@HystrixCommand(fallbackMethod="localSubstract")
 	@GetMapping("/remoteSubstract/{a}/{b}")
 	public RemoteSubstractResult remoteSubstract(@PathVariable int a,@PathVariable int b) {
@@ -28,6 +32,12 @@ public class FeignSampleServiceController {
 		return result;
 	}
 	
+	@HystrixCommand(fallbackMethod="nodeFallbackSubstract")
+	@GetMapping("/nodeSubstract/{a}/{b}")
+	public RemoteSubstractResult nodeSubstract(@PathVariable int a,@PathVariable int b) {
+		return nodeProxy.substract2Numbers(a, b);
+	}
+	
 	public RemoteSubstractResult localSubstract(int a, int b) {
 		LOG.error("remote substract failed, using local substract");
 		RemoteSubstractResult rsr = new RemoteSubstractResult();
@@ -35,4 +45,12 @@ public class FeignSampleServiceController {
 		return rsr;
 	}
 
+	public RemoteSubstractResult nodeFallbackSubstract(int a, int b) {
+		LOG.error("remote node substract failed, using local substract");
+		RemoteSubstractResult rsr = new RemoteSubstractResult();
+		rsr.setResult(a-b);
+		rsr.setServiceData("node substract failed");
+		return rsr;
+	}
+	
 }
